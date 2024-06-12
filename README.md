@@ -34,7 +34,12 @@ Suported titles: Street Racing Syndicate (PC) only.
 
 Converts Arcbank into gltf model. Unlinked assets, that are not port of gltf model will be extracted separately.
 
-Suported titles: Street Racing Syndicate (PC) only.
+Suported titles:
+
+|Title|PC|
+|---|---|
+|Big Mutha Truckers 2|✔|
+|Street Racing Syndicate|✔|
 
 ### Input file patterns: `.ARC$`
 

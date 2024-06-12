@@ -14,7 +14,12 @@ Suported titles: Street Racing Syndicate (PC) only.</arc_anim>
 
 <arc_extract name="Arc Extract">Converts Arcbank into gltf model. Unlinked assets, that are not port of gltf model will be extracted separately.
 
-Suported titles: Street Racing Syndicate (PC) only.</arc_extract>
+Suported titles:
+
+|Title|PC|
+|---|---|
+|Big Mutha Truckers 2|✔|
+|Street Racing Syndicate|✔|</arc_extract>
 
 <cdfiles_extract name="Extract CDFILES">Extracts `CDFILES.DAT`/`ARCHIVE.AR` pairs.
 
@@ -39,8 +44,7 @@ Suported titles:
 |Supercar Challange|||||✔|||
 |Cartoon Network Racing||✔||||||
 |The Fast and the Furious||✔||||||
-|Street Racing Syndicate|✔|✔|✔|✔||||
-</cdfiles_extract>
+|Street Racing Syndicate|✔|✔|✔|✔||||</cdfiles_extract>
 
 <lda_to_txt name="LDA to text">Converts LDA format into text file.
 

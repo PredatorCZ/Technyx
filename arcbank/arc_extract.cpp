@@ -419,9 +419,15 @@ struct SkinnedModel : Model {};
 
 struct Attachment : NodeBase {};
 
-using NodeVariant =
-    std::variant<Skeleton, Bone, Model, InstancedModel, LightNode,
-                 DeformedModel, Camera, SkinnedModel, Attachment>;
+struct UnkNode : NodeBase {};
+
+struct AnimatedModel : DeformedModel {
+  // bmt2 only
+};
+
+using NodeVariant = std::variant<Skeleton, Bone, Model, InstancedModel,
+                                 LightNode, DeformedModel, Camera, SkinnedModel,
+                                 Attachment, UnkNode, AnimatedModel>;
 
 struct Texture {
   static constexpr uint32 TYPE_PALETTE = 0x29;
@@ -694,8 +700,8 @@ void AppProcessFile(AppContext *ctx) {
     int32 glIndex = -1;
   };
 
-  std::vector<Mesh> meshes(hdr.numMeshes);
-  std::vector<Mesh> skinnedMeshes(hdr.numSkinnedModels);
+  std::vector<Mesh> meshes;
+  std::vector<Mesh> skinnedMeshes;
   std::vector<Indices> indexBuffers(hdr.numIndexBuffers);
   std::vector<Attrs> vertexBuffers(hdr.numVertexBuffers);
   std::vector<TexturePtr> textures;
@@ -753,16 +759,16 @@ void AppProcessFile(AppContext *ctx) {
       data.name = fileName;
       data.index = e.index;
       rd.Read(data);
-      meshes.at(e.index) = std::move(data);
+      meshes.emplace_back(data);
       break;
     }
 
     case Type::SkinnedMesh: {
       Mesh data;
       data.name = fileName;
-      data.index = e.index;
+      data.index = std::max(int32(e.index), 0);
       rd.Read(data);
-      skinnedMeshes.at(e.index) = std::move(data);
+      skinnedMeshes.emplace_back(data);
       break;
     }
 
@@ -796,6 +802,15 @@ void AppProcessFile(AppContext *ctx) {
 
     case Type::DeformedModel: {
       DeformedModel nde;
+      nde.name = fileName;
+      nde.entryIndex = e.index;
+      rd.Read(nde);
+      nodes.emplace_back(nde);
+      break;
+    }
+
+    case Type::AnimatedModel: {
+      AnimatedModel nde;
       nde.name = fileName;
       nde.entryIndex = e.index;
       rd.Read(nde);
@@ -851,6 +866,15 @@ void AppProcessFile(AppContext *ctx) {
 
     case Type::Attachment: {
       Attachment nde;
+      nde.name = fileName;
+      nde.entryIndex = e.index;
+      rd.Read(nde);
+      nodes.emplace_back(nde);
+      break;
+    }
+
+    case Type::UnkNode: {
+      UnkNode nde;
       nde.name = fileName;
       nde.entryIndex = e.index;
       rd.Read(nde);
@@ -950,9 +974,10 @@ void AppProcessFile(AppContext *ctx) {
                                std::is_same_v<EntryType, SkinnedModel> ||
                                std::is_same_v<EntryType, Skeleton>) {
             models[i.meshIndex].emplace_back(main.nodes.size());
-          } else if constexpr (std::is_same_v<EntryType, DeformedModel>) {
+          } else if constexpr (std::is_same_v<EntryType, DeformedModel> ||
+                               std::is_same_v<EntryType, AnimatedModel>) {
+            models[i.meshIndex].emplace_back(main.nodes.size());
             for (int32 m : i.meshes) {
-              models[i.meshIndex].emplace_back(main.nodes.size());
               models[m].emplace_back(main.nodes.size());
             }
           }
@@ -1133,12 +1158,16 @@ void AppProcessFile(AppContext *ctx) {
       }
     }
 
-    for (auto &n : models.at(m.index + indexOffset)) {
-      main.nodes.at(n).mesh = main.meshes.size();
+    try {
+      for (auto &n : models.at(m.index + indexOffset)) {
+        main.nodes.at(n).mesh = main.meshes.size();
 
-      if (useSkin) {
-        main.nodes.at(n).skin = main.skins.size() - 1;
+        if (useSkin) {
+          main.nodes.at(n).skin = main.skins.size() - 1;
+        }
       }
+    } catch (const std::out_of_range &) {
+      PrintWarning("Mesh node: ", m.name, "appears to be unlinked.");
     }
 
     main.meshes.emplace_back(std::move(mesh));
@@ -1194,6 +1223,7 @@ void AppProcessFile(AppContext *ctx) {
     case Type::LightNode:
     case Type::Camera:
     case Type::Attachment:
+    case Type::UnkNode:
     case Type::Material:
     case Type::AnimatedNode:
     case Type::Animation:
