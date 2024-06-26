@@ -1,0 +1,64 @@
+name: release nightly
+
+on:
+  workflow_run:
+    workflows:
+      - build
+    types:
+      - completed
+    branches:
+      - master
+
+env:
+  SK_VERSION: nover
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+    - name: Download artifacts
+      uses: dawidd6/action-download-artifact@v3
+      with:
+        workflow: cmake.yml
+        branch: ${{ github.event.release.target_commitish }}
+        workflow_conclusion: success
+
+    - name: Move artifacts to workspace
+      run: |
+        for file in *; do
+          if [ -d $file ]; then
+              pushd $file
+              if [[ $file == *-win64 ]]; then
+                7z a ../$file.7z .
+              else
+                BASENAME=$(basename *.tar.xz .tar.xz)
+                echo "SK_VERSION=$(echo ${BASENAME} | cut -d'-' -f 2)" >> $GITHUB_ENV
+                mv *.tar.xz ..
+              fi
+              popd
+          fi
+        done
+
+    - uses: actions/checkout@v4
+      with:
+        path: repo
+
+    - name: Delete release
+      working-directory: repo
+      run: gh release delete nightly --cleanup-tag
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Wait a sec
+      run: sleep 2
+
+    - name: Release them
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          *.xz
+          *.7z
+          *.sig
+        tag_name: nightly
+        name: Technyx ${{env.SK_VERSION}} (nightly)
