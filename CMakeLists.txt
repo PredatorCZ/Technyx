@@ -22,6 +22,7 @@ set_target_properties(spike_cli PROPERTIES OUTPUT_NAME technyx_toolset)
 add_spike_subdir(archive)
 add_spike_subdir(arcbank)
 add_spike_subdir(text)
+add_spike_subdir(sound)
 
 if (NOT ${CMAKE_BUILD_TYPE} STREQUAL Release)
   add_spike_subdir(dev)
