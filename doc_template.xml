@@ -46,9 +46,7 @@ Suported titles:
 |The Fast and the Furious||✔||||||
 |Street Racing Syndicate|✔|✔|✔|✔||||</cdfiles_extract>
 
-<lda_to_txt name="LDA to text">Converts LDA format into text file.
-
-Suported titles: All</lda_to_txt>
+<hdr_to_wav name="HDR/RAW to WAV">Converts HDR/RAW audio bank to WAV files.</hdr_to_wav>
 
 <toolset_footer>## [Latest Release](https://github.com/PredatorCZ/Technyx/releases)
 

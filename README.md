@@ -10,7 +10,7 @@ Head to this **[Wiki](https://github.com/PredatorCZ/Spike/wiki/Spike)** for more
 <li><a href="#Arc-Animations">Arc Animations</a></li>
 <li><a href="#Arc-Extract">Arc Extract</a></li>
 <li><a href="#Extract-CDFILES">Extract CDFILES</a></li>
-<li><a href="#LDA-to-text">LDA to text</a></li>
+<li><a href="#HDR/RAW-to-WAV">HDR/RAW to WAV</a></li>
 </ul>
 
 ## Arc Animations
@@ -74,15 +74,13 @@ Suported titles:
 
 ### Input file patterns: `cdfiles*.dat$`, `CDFILES*.DAT$`, `CDFILES*.dat$`
 
-## LDA to text
+## HDR/RAW to WAV
 
-### Module command: lda_to_txt
+### Module command: hdr_to_wav
 
-Converts LDA format into text file.
+Converts HDR/RAW audio bank to WAV files.
 
-Suported titles: All
-
-### Input file patterns: `.LDA$`
+### Input file patterns: `.HDR$`
 
 ## [Latest Release](https://github.com/PredatorCZ/Technyx/releases)
 
