@@ -128,7 +128,7 @@ std::string CatName(BinReaderRef rd, const std::vector<std::string> &names) {
   std::string name;
 
   // Looks like utf-8 encoding
-  while (true) {
+  while (!rd.IsEOF()) {
     uint32 index = 0;
     rd.Read(curChar);
 

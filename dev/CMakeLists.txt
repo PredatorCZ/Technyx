@@ -20,4 +20,4 @@ build_target(
   START_YEAR
   2023)
 
-install(TARGETS arc_extract DESTINATION bin)
+install(TARGETS arc_decompress DESTINATION bin)
